@@ -15,7 +15,7 @@ limits.
 - selected cached `.olean` files needed by `BundleImports.lean`
 - wrapper scripts and a smoke test
 
-The default import set is in `BundleImports.lean`:
+The default import set is in `OfflineBundle/BundleImports.lean`:
 
 ```lean
 import Mathlib.Data.Finset.Basic
@@ -24,6 +24,8 @@ import Mathlib.Data.Real.Basic
 
 Add the exact Mathlib imports your target files need, then rebuild the bundle.
 Avoid `import Mathlib` unless you are prepared for a very large multipart upload.
+The root `BundleImports.lean` file imports `OfflineBundle.BundleImports` as a
+convenience wrapper.
 
 ## Build The ChatGPT-Sized Bundle
 
@@ -72,8 +74,8 @@ To check your own file:
 ./scripts/check_file.sh path/to/File.lean
 ```
 
-For best results, make your file import the same narrow modules listed in
-`BundleImports.lean`, or import a local module that does.
+For best results, make your file import `BundleImports`,
+`OfflineBundle.BundleImports`, or the same narrow Mathlib modules listed there.
 
 ## Full Local Bundle
 
@@ -103,9 +105,8 @@ publishes it with the release assets.
 
 ## Common Failure Modes
 
-- `unknown module 'Mathlib.X.Y'`: add that import to `BundleImports.lean` and rebuild.
+- `unknown module 'Mathlib.X.Y'`: add that import to `OfflineBundle/BundleImports.lean` and rebuild.
 - `olean file ... incompatible`: the Lean version or Mathlib revision changed.
 - Lake tries to download: use `./scripts/check_file.sh`, which sets paths directly.
 - dynamic library load error: rebuild and keep package `.so*` files in the staged bundle.
 - sandbox process killed: the import closure is still too large; narrow the imports.
-

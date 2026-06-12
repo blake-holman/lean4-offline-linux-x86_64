@@ -29,5 +29,5 @@ vendor/lean/bin/lake --version
 
 lake update
 lake exe cache get
-lake build +BundleImports:olean +OfflineBundle.Smoke:olean
+lake build +OfflineBundle.BundleImports:olean +OfflineBundle.Smoke:olean
 lake env lean test/OfflineSmoke.lean
