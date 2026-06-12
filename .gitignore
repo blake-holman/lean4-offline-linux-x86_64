@@ -1,0 +1,11 @@
+.lake/
+vendor/
+dist/
+tmp/
+__pycache__/
+*.log.tmp
+*.tar.gz
+*.tar.xz
+*.tar.xz.part.*
+*.SHA256SUMS
+.DS_Store
