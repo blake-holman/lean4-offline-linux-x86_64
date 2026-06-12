@@ -1,0 +1,52 @@
+name: Build offline bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install system tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y zstd xz-utils
+
+      - name: Build targeted ChatGPT bundle
+        run: |
+          set -euo pipefail
+          ./scripts/build_chatgpt_bundle.sh
+
+      - name: Verify clean offline-style copy
+        run: |
+          set -euo pipefail
+          mkdir -p verification
+          ./scripts/verify_offline_clean.sh dist/lean-chatgpt-bundle-linux-x86_64 2>&1 | tee verification/clean-linux-x86_64.log
+
+      - name: Stage release files
+        run: |
+          set -euo pipefail
+          cp verification/clean-linux-x86_64.log dist/clean-linux-x86_64.log
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="v4.30.0-offline-linux-x86_64"
+          gh release delete "$tag" --yes --cleanup-tag || true
+          git tag "$tag"
+          git push origin "$tag"
+          gh release create "$tag" \
+            dist/lean-chatgpt-bundle-linux-x86_64.tar.xz.part.* \
+            dist/lean-chatgpt-bundle-linux-x86_64.SHA256SUMS \
+            dist/clean-linux-x86_64.log \
+            --title "Lean 4.30.0 targeted offline Linux x86_64 bundle" \
+            --notes "Targeted Lean 4 + Mathlib import-closure bundle for Linux x86_64 offline use. Reassemble the .part files before unpacking."
