@@ -1,7 +1,7 @@
 import OfflineBundle.BundleImports
 
 #check Real
-#check Finset.card
+#check Finset
 
 example : (2 : Nat) + 2 = 4 := by
   rfl
